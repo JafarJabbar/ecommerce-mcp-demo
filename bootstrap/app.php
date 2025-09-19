@@ -10,13 +10,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->validateCsrfTokens(except: [
-            'mcp/',
-            'mcp/*',
+    ->withMiddleware(function (Middleware $middleware) {
+        // Register middleware alias
+        $middleware->alias([
+            '2fa' => \App\Http\Middleware\Ensure2FA::class,
         ]);
 
+        // Optional: Add global middleware
+        // $middleware->web(append: [
+        //     \App\Http\Middleware\HandleInertiaRequests::class,
+        // ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

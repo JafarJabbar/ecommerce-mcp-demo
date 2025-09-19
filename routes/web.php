@@ -4,6 +4,45 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Mcp\Tools\EcommerceStatisticsTool;
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\TwoFactorController;
+use App\Http\Controllers\DashboardController;
+
+// Guest routes
+Route::middleware('guest')->group(function () {
+    Route::get('/', [AuthController::class, 'showLogin'])->name('home');
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+});
+
+// 2FA verification routes (accessible when logged out with session)
+Route::middleware('web')->group(function () {
+    Route::get('/2fa/verify', [TwoFactorController::class, 'showVerify'])->name('2fa.verify');
+    Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->name('2fa.verify.post');
+});
+
+// Mandatory 2FA setup routes (only for authenticated users without 2FA)
+Route::middleware('auth')->group(function () {
+    Route::get('/2fa/setup-required', [TwoFactorController::class, 'setupRequired'])->name('2fa.setup.required');
+    Route::post('/2fa/confirm-required', [TwoFactorController::class, 'confirmRequired'])->name('2fa.confirm.required');
+});
+
+// Authenticated routes with mandatory 2FA enforcement
+Route::middleware(['auth', '2fa'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // 2FA management routes (disable functionality removed)
+    Route::prefix('2fa')->name('2fa.')->group(function () {
+        Route::get('/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('recovery-codes');
+        // Note: enable and disable routes removed since 2FA is mandatory
+    });
+});
+
+
+
 /*
 |--------------------------------------------------------------------------
 | AI/MCP Routes
