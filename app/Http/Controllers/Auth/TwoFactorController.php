@@ -86,7 +86,7 @@ class TwoFactorController extends Controller
     public function confirm(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|size:6|numeric'
+            'code' => 'required|string|numeric'
         ]);
 
         $user = Auth::user();
@@ -116,7 +116,7 @@ class TwoFactorController extends Controller
     public function confirmRequired(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|size:6|numeric'
+            'code' => 'required|string|numeric'
         ]);
 
         $user = Auth::user();
@@ -158,7 +158,7 @@ class TwoFactorController extends Controller
     public function verify(Request $request)
     {
         $request->validate([
-            'code' => 'required|string|min:6|max:8'
+            'code' => 'required|string'
         ]);
 
         $userId = session('2fa_user_id');

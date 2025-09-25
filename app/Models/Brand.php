@@ -1,34 +1,22 @@
 <?php
-// app/Models/Category.php
+// app/Models/Brand.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Category extends Model
+class Brand extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name', 'slug', 'description', 'image', 'parent_id',
-        'is_active', 'sort_order'
+        'name', 'slug', 'description', 'logo', 'website', 'is_active'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Category::class, 'parent_id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order');
-    }
 
     public function products(): HasMany
     {
@@ -43,10 +31,5 @@ class Category extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
-    }
-
-    public function scopeRoot($query)
-    {
-        return $query->whereNull('parent_id');
     }
 }
